@@ -16,8 +16,8 @@ exchange.secret = os.environ["BYBIT_SECRET_TEST"]
 exchange.set_sandbox_mode(True)
 
 
-print(util.cal_amount(exchange))
 
+print("START TRADING")
 slack_webhook("START TRADING")
 
 position = 0 # 0:None 1:buy 2:sell
@@ -27,6 +27,9 @@ rate_at=0
 while True:
     # every 15minutes
     minute=0
+
+    balance = util.get_balance_now(exchange)
+    print("[EVERY15MINUTES] balance now: "+str(balance))
 
     since_time=int(time.time()-60*15*60)*1000 # 現在のUNIX秒から60足分戻してmsに
     
@@ -43,7 +46,7 @@ while True:
     # 短期移動平均線 > 長期移動平均線 が 短期移動平均線 < 長期移動平均線 になったらデッドクロス
     dead_cross = sma_short.iloc[-1] < sma_long.iloc[-1] \
         and sma_short.iloc[-2] > sma_long.iloc[-2] 
-
+    print("  golden cross: ",golden_cross,"\n  dead cross: ",dead_cross)
 
     if position!=0: # ポジションを持ってないとき
         if golden_cross:
@@ -53,8 +56,8 @@ while True:
             exchange.create_order(symbol=config.symbol, type='market', side='buy', amount=amount)
             rate_at = util.get_rate_now(exchange)
             position = 1
-            print("[BUY] Captured golden cross! \n symbol: "+config.symbol+"\n amount: "+str(amount)+"\n rate: "+str(rate_at)+"\n  balance now: "+str(balance))
-            slack_webhook("[BUY] Captured golden cross! \n symbol: "+config.symbol+"\n amount: "+str(amount)+"\n rate: "+str(rate_at)+"\n balance now: "+str(balance))
+            print("[BUY] Captured golden cross! \n  symbol: "+config.symbol+"\n  amount: "+str(amount)+"\n  rate: "+str(rate_at)+"\n  balance now: "+str(balance))
+            slack_webhook("[BUY] Captured golden cross! \n  symbol: "+config.symbol+"\n  amount: "+str(amount)+"\n  rate: "+str(rate_at)+"\n  balance now: "+str(balance))
         elif dead_cross:
             amount = util.cal_amount(exchange)
             balance = util.get_balance_now(exchange)
@@ -62,8 +65,8 @@ while True:
             exchange.create_order(symbol=config.symbol, type='market', side='sell', amount=amount)
             rate_at = util.get_rate_now(exchange)
             position = 2
-            print("[SELL] Captured dead cross! \n symbol: "+config.symbol+"\n amount: "+str(amount)+"\n rate: "+str(rate_at)+"\n balance now: "+str(balance))
-            slack_webhook("[SELL] Captured dead cross! \n symbol: "+config.symbol+"\n amount: "+str(amount)+"\n rate: "+str(rate_at)+"\n balance now: "+str(balance))
+            print("[SELL] Captured dead cross! \n  symbol: "+config.symbol+"\n  amount: "+str(amount)+"\n  rate: "+str(rate_at)+"\n  balance now: "+str(balance))
+            slack_webhook("[SELL] Captured dead cross! \n  symbol: "+config.symbol+"\n  amount: "+str(amount)+"\n  rate: "+str(rate_at)+"\n  balance now: "+str(balance))
 
     while minute<15:
         # every minute
@@ -79,8 +82,8 @@ while True:
                 time.sleep(1)
                 balance = util.get_balance_now(exchange)
 
-                print("[PROFIT] Captured 2% UP \n balance now: "+str(balance))
-                slack_webhook("[PROFIT] Captured 2% UP \n balance now: "+str(balance))
+                print("[PROFIT] Captured 2% UP \n  balance now: "+str(balance))
+                slack_webhook("[PROFIT] Captured 2% UP \n  balance now: "+str(balance))
 
             elif change_rate<99: # 1%以上の値下がりで損切
                 exchange.create_order(symbol=config.symbol, type='market', side='sell', amount=amount,params={"reduceOnly":True})
@@ -91,8 +94,8 @@ while True:
                 time.sleep(1)
                 balance = util.get_balance_now(exchange)
 
-                print("[LOSS] Captured 1% DOWN \n balance now: "+str(balance))
-                slack_webhook("[LOSS] Captured 1% DOWN \n balance now: "+str(balance))
+                print("[LOSS] Captured 1% DOWN \n  balance now: "+str(balance))
+                slack_webhook("[LOSS] Captured 1% DOWN \n  balance now: "+str(balance))
             
         elif position ==2: # 売ってたら
             rate_now = util.get_rate_now(exchange)
@@ -106,8 +109,8 @@ while True:
                 time.sleep(1)
                 balance = util.get_balance_now(exchange)
 
-                print("[PROFIT] Captured 2% DOWN \n balance now: "+str(balance))
-                slack_webhook("[PROFIT] Captured 2% DOWN \n balance now: "+str(balance))
+                print("[PROFIT] Captured 2% DOWN \n  balance now: "+str(balance))
+                slack_webhook("[PROFIT] Captured 2% DOWN \n  balance now: "+str(balance))
 
             elif change_rate>101: # 1%以上の値上がりで損切
                 exchange.create_order(symbol=config.symbol, type='market', side='buy', amount=amount,params={"reduceOnly":True})
@@ -118,8 +121,8 @@ while True:
                 time.sleep(1)
                 balance = util.get_balance_now(exchange)
 
-                print("[LOSS] Captured 1% UP \n balance now: "+str(balance))
-                slack_webhook("[LOSS] Captured 1% UP \n balance now: "+str(balance))
+                print("[LOSS] Captured 1% UP \n  balance now: "+str(balance))
+                slack_webhook("[LOSS] Captured 1% UP \n  balance now: "+str(balance))
 
         time.sleep(60)
         minute+=1
