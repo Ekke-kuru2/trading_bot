@@ -16,7 +16,7 @@ exchange.secret = os.environ["BYBIT_SECRET_TEST"]
 exchange.set_sandbox_mode(True)
 
 
-print(util.cal_amount(exchange,10))
+print(util.cal_amount(exchange))
 
 #slack_webhook("test")
 
