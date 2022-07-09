@@ -11,7 +11,7 @@ class util():
     def cal_amount(exchange:ccxt.bybit):
         ticker_info = exchange.fetch_ticker(config.symbol)
         ticker_balance = exchange.fetch_balance()
-        return ticker_balance["free"]["USDT"]*config.leverage/ticker_info["close"]*2
+        return ticker_balance["free"]["USDT"]*config.leverage/ticker_info["close"]/2
 
         
         
