@@ -6,36 +6,28 @@ import pandas as pd
 import sys,os
 
 from slack import slack_webhook
-
-
-
-# 単純移動平均線を算出
-def make_sma(candles, span):
-    return pd.Series(candles["close"]).rolling(window = span).mean()
+from util import util
+from config import config
 
 
 exchange = ccxt.bybit()
 exchange.apiKey = os.environ["BYBIT_APIKEY_TEST"]
 exchange.secret = os.environ["BYBIT_SECRET_TEST"]
 exchange.set_sandbox_mode(True)
-crypto = 'BTC'
-currency = 'USDT'
-interval = 60
-duration = 15#移動平均(大きいほう)のサイズ
-trading_amount = 30
 
-symbol = crypto + currency
-position=0#いくら買ってるか
-last_rate=0#買ったときの値
+
+print(util.cal_amount(exchange,10))
+
+#slack_webhook("test")
 
 '''
-ticker_info = exchange.fetch_ticker(symbol)
-print(ticker_info)
-ticker_balance = exchange.fetch_balance()
-print(ticker_balance)
-'''
+while True:
+    minute=0
+    while minute<15:
 
-slack_webhook("test")
+        time.sleep(60)
+        minute+=1
+        '''
 
 #exchange.create_order(symbol=symbol, type='market', side='sell', amount=0.002)
 #exchange.create_order(symbol=symbol, type='market', side='buy', amount=0.002,params={"reduceOnly":True})
