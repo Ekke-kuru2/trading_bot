@@ -32,13 +32,13 @@ while True:
     balance = util.get_balance_now(exchange)
     print("[EVERY15MINUTES] balance now: ",str(balance),"(",dt.datetime.now(),")")
 
-    since_time=int(time.time()-60*15*60)*1000 # 現在のUNIX秒から60足分戻してmsに
+    since_time=int(time.time()-15*13)*1000 # 現在のUNIX秒から60足分戻してmsに
     
     #ロウソク足を取得
-    rate_df = pd.DataFrame(data=exchange.fetch_ohlcv(symbol=config.symbol,timeframe=config.timeframe,since=since_time,limit=60),columns=["timestamp","open","high","low","close","volume"])
+    rate_df = pd.DataFrame(data=exchange.fetch_ohlcv(symbol=config.symbol,timeframe=config.timeframe,since=since_time,limit=13),columns=["timestamp","open","high","low","close","volume"])
 
-    sma_short = util.make_sma(rate_df, 30) # 短期移動平均線を作成 ※期間についてはお好み
-    sma_long = util.make_sma(rate_df, 60) # 長期移動平均線を作成 ※期間についてはお好み
+    sma_short = util.make_sma(rate_df, 5) # 短期移動平均線を作成 ※期間についてはお好み
+    sma_long = util.make_sma(rate_df, 13) # 長期移動平均線を作成 ※期間についてはお好み
 
     # 短期移動平均線 < 長期移動平均線 が 短期移動平均線 > 長期移動平均線 になったらゴールデンクロス
     golden_cross = sma_short.iloc[-1] > sma_long.iloc[-1] \
@@ -69,7 +69,7 @@ while True:
             print("[SELL] Captured dead cross!","(",dt.datetime.now(),")","\n  symbol: "+config.symbol+"\n  amount: "+str(amount)+"\n  rate: "+str(rate_at)+"\n  balance now: "+str(balance))
             slack_webhook("[SELL] Captured dead cross! ("+str(dt.datetime.now())+")\n  symbol: "+config.symbol+"\n  amount: "+str(amount)+"\n  rate: "+str(rate_at)+"\n  balance now: "+str(balance))
 
-    while minute<15:
+    while minute<13:
         # every minute
 
         if position == 1: # 買ってたら
@@ -125,7 +125,7 @@ while True:
                 print("[LOSS] Captured 1% UP","(",dt.datetime.now(),")","\n  balance now: "+str(balance))
                 slack_webhook("[LOSS] Captured 1% UP("+str(dt.datetime.now())+")\n  balance now: "+str(balance))
 
-        time.sleep(60)
+        time.sleep(1)
         minute+=1
         
 

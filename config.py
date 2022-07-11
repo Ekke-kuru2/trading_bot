@@ -4,6 +4,6 @@ class config():
     symbol=crypt+currency
     leverage=10
 
-    timeframe="15m"
+    timeframe="1m"
 
 
