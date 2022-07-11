@@ -52,5 +52,5 @@ while True:
         and sma_short.iloc[-4] > sma_long.iloc[-4]
     '''
     
-    time.sleep(1)
+    time.sleep(0.2)
     i+=1
