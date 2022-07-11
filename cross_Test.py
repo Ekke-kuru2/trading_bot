@@ -19,15 +19,15 @@ exchange.set_sandbox_mode(True)
 
 while True:
     i=1
-    since_time=int(time.time()-60*15*60-60*15*i)*1000 # 現在のUNIX秒から60足分戻してmsに
+    since_time=int(time.time()-60*15*120-60*15*i)*1000 # 現在のUNIX秒から60足分戻してmsに
     
     #ロウソク足を取得
-    rate_df = pd.DataFrame(data=exchange.fetch_ohlcv(symbol=config.symbol,timeframe=config.timeframe,since=since_time,limit=60),columns=["timestamp","open","high","low","close","volume"])
+    rate_df = pd.DataFrame(data=exchange.fetch_ohlcv(symbol=config.symbol,timeframe=config.timeframe,since=since_time,limit=120),columns=["timestamp","open","high","low","close","volume"])
 
     sma_short = util.make_sma(rate_df, 30) # 短期移動平均線を作成 ※期間についてはお好み
     sma_long = util.make_sma(rate_df, 60) # 長期移動平均線を作成 ※期間についてはお好み
-    print(sma_short)
-    print(sma_long)
+    #print(sma_short)
+    #print(sma_long)
 
     '''
     # 短期移動平均線 < 長期移動平均線 が 短期移動平均線 > 長期移動平均線 になったらゴールデンクロス
