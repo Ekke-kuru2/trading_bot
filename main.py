@@ -40,14 +40,27 @@ while True:
     sma_short = util.make_sma(rate_df, 5) # 短期移動平均線を作成 ※期間についてはお好み
     sma_long = util.make_sma(rate_df, 13) # 長期移動平均線を作成 ※期間についてはお好み
 
+    '''
     # 短期移動平均線 < 長期移動平均線 が 短期移動平均線 > 長期移動平均線 になったらゴールデンクロス
-    golden_cross = sma_short.iloc[-1] > sma_long.iloc[-1] \
+    golden_cross = sma_short.iloc[-1] > sma_long.iloc[-1] 
         and sma_short.iloc[-2] < sma_long.iloc[-2] 
 
     # 短期移動平均線 > 長期移動平均線 が 短期移動平均線 < 長期移動平均線 になったらデッドクロス
-    dead_cross = sma_short.iloc[-1] < sma_long.iloc[-1] \
+    dead_cross = sma_short.iloc[-1] < sma_long.iloc[-1] 
         and sma_short.iloc[-2] > sma_long.iloc[-2] 
     print("  golden cross: ",golden_cross,"\n  dead cross: ",dead_cross)
+    '''
+
+    golden_cross = sma_short.iloc[-1] > sma_long.iloc[-1] \
+            and sma_short.iloc[-2] > sma_long.iloc[-2] \
+            and sma_short.iloc[-3] > sma_long.iloc[-3] \
+            and sma_short.iloc[-4] < sma_long.iloc[-4]
+
+    # 短期移動平均線 < 長期移動平均線 の状態が3本続いたらデッドクロス（騙し防止のために判断まで少し待つ）
+    dead_cross = sma_short.iloc[-1] < sma_long.iloc[-1] \
+        and sma_short.iloc[-2] < sma_long.iloc[-2] \
+        and sma_short.iloc[-3] < sma_long.iloc[-3] \
+        and sma_short.iloc[-4] > sma_long.iloc[-4]
 
     if position!=0: # ポジションを持ってないとき
         if golden_cross:
